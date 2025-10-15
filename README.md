@@ -70,7 +70,7 @@
 
 ### 2. Документация API
 
-[Swagger](https://editor.swagger.io)
+Добавил в проект файл - swagger.yaml
 
 # Задание 5. Работа с docker и docker-compose
 
