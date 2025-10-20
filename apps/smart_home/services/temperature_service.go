@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
+	"log"
 )
 
 // TemperatureService handles fetching temperature data from external API
@@ -37,7 +39,8 @@ func NewTemperatureService(baseURL string) *TemperatureService {
 
 // GetTemperature fetches temperature data for a specific location
 func (s *TemperatureService) GetTemperature(location string) (*TemperatureResponse, error) {
-	url := fmt.Sprintf("%s/temperature?location=%s", s.BaseURL, location)
+	encodedLocation := url.QueryEscape(location)
+	url := fmt.Sprintf("%s/temperature?location=%s", s.BaseURL, encodedLocation)
 
 	resp, err := s.HTTPClient.Get(url)
 	if err != nil {
@@ -59,7 +62,7 @@ func (s *TemperatureService) GetTemperature(location string) (*TemperatureRespon
 
 // GetTemperatureByID fetches temperature data for a specific sensor ID
 func (s *TemperatureService) GetTemperatureByID(sensorID string) (*TemperatureResponse, error) {
-	url := fmt.Sprintf("%s/temperature/%s", s.BaseURL, sensorID)
+	url := fmt.Sprintf("%s/temperature?sensorId=%s", s.BaseURL, sensorID)
 
 	resp, err := s.HTTPClient.Get(url)
 	if err != nil {

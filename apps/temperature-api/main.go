@@ -4,18 +4,24 @@ import (
 	"encoding/json"
 	"math/rand"
 	"net/http"
+	"time"
 )
 
 type TemperatureResponse struct {
-	Location    string  `json:"location"`
-	SensorID    string  `json:"sensorId"`
-	Temperature float64 `json:"temperature"`
+	Value       float64   `json:"value"`
+	Unit        string    `json:"unit"`
+	Timestamp   time.Time `json:"timestamp"`
+	Location    string    `json:"location"`
+	Status      string    `json:"status"`
+	SensorID    string    `json:"sensor_id"`
+	SensorType  string    `json:"sensor_type"`
+	Description string    `json:"description"`
 }
 
 func main() {
 	http.HandleFunc("/temperature", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		
+
 		// Получаем параметры из query string
 		location := r.URL.Query().Get("location")
 		sensorID := r.URL.Query().Get("sensorId")
@@ -47,19 +53,25 @@ func main() {
 				sensorID = "0"
 			}
 		}
-		
-		// Генерируем случайную температуру от 18.0 до 25.0
+
 		temperature := 18.0 + rand.Float64()*7.0
-		
-		// Возвращаем JSON с данными
+
 		response := TemperatureResponse{
+			Value:       temperature,
+			Unit:        "°C",
+			Timestamp:   time.Now(),
 			Location:    location,
+			Status:      "active",
 			SensorID:    sensorID,
-			Temperature: temperature,
+			SensorType:  "temperature",
+			Description: "Temperature sensor in " + location,
 		}
-		
-		json.NewEncoder(w).Encode(response)
+
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, "Error encoding response", http.StatusInternalServerError)
+			return
+		}
 	})
-	
+
 	http.ListenAndServe(":8081", nil)
 }

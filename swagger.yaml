@@ -1,0 +1,562 @@
+openapi: 3.0.3
+info:
+  title: Smart House Platform API
+  version: 1.0.0
+
+#user_id достаем из auth-токена
+
+servers:
+  - url: https://location.smarthome.com/v1
+    description: Location Service
+  - url: https://heating.smarthome.com/v1
+    description: Heating Service
+  - url: https://light.smarthome.com/v1
+    description: Light Service
+    
+paths:
+  /homes:
+    get:
+      tags:
+        - Location Service
+      summary: Получение всех домов пользователя в приложении
+      servers:
+        - url: https://location.smarthome.com/v1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/locationHomes'
+    post:
+      tags:
+        - Location Service
+      summary: Добавление нового дома пользователем
+      servers:
+        - url: https://location.smarthome.com/v1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createLocationHome'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  
+  /homes/{homeId}: 
+    put:
+      tags:
+        - Location Service
+      summary: Изменение информации о доме
+      servers:
+        - url: https://location.smarthome.com/v1
+      parameters:
+        - name: homeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateLocationHome'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    
+    delete:
+      tags:
+        - Location Service
+      summary: Изменение информации о доме
+      servers:
+        - url: https://location.smarthome.com/v1
+      parameters:
+        - name: homeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+        
+          
+                  
+  /homes/{homeId}/rooms:
+    get:
+      tags:
+        - Location Service
+      summary: Получение всех комнат пользователя
+      servers:
+        - url: https://location.smarthome.com/v1
+      parameters:
+        - name: homeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/locationRooms'
+    
+    post:
+      tags:
+        - Location Service
+      summary: Добавление новой комнаты пользователем
+      servers:
+        - url: https://location.smarthome.com/v1
+      parameters:
+        - name: homeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createLocationRoom'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      
+  
+  /homes/{homeId}/rooms/{roomId}:
+    put:
+      tags:
+        - Location Service
+      summary: Изменение информации о комнате
+      servers:
+        - url: https://location.smarthome.com/v1
+      parameters:
+        - name: homeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateLocationRoom'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    
+    delete:
+      tags:
+        - Location Service
+      summary: Изменение информации о комнате
+      servers:
+        - url: https://location.smarthome.com/v1
+      parameters:
+        - name: homeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          
+  /heating/devices:
+    get:
+      tags:
+        - Heating Service
+      summary: Получение всех отопительных датчиков
+      servers:
+        - url: https://heating.smarthome.com/v1
+      parameters:
+        - name: roomId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/heatingDevices'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+          
+    post:
+      tags:
+        - Heating Service
+      summary: Подключение нового датчика в приложении
+      servers:
+        - url: https://heating.smarthome.com/v1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createHeatingDevice'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/heatingDevices'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+          
+  
+  /heating/device/{deviceId}:
+    get:
+      tags:
+        - Heating Service
+      summary: Получение информации по конкретному датчику
+      servers:
+        - url: https://heating.smarthome.com/v1
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/heatingDevice'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          
+    put:
+      tags:
+        - Heating Service
+      summary: Обновление информации по тепловому датчику
+      servers:
+        - url: https://heating.smarthome.com/v1
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateHeatingDevice'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    
+    delete:
+      tags:
+        - Heating Service
+      summary: Удаление теплового датчика
+      servers:
+        - url: https://heating.smarthome.com/v1
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    
+  
+  
+components:
+  schemas:
+    locationHomes:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        address:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          
+    createLocationHome:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        address:
+          type: string
+    
+    updateLocationHome:
+      type: object
+      properties:
+        title:
+          type: string
+        address:
+          type: string
+        
+          
+    locationRooms:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        room_type:
+          type: string
+          enum: [LIVING_ROOM, BEDROOM, KITCHEN, BATHROOM, HALLWAY, OFFICE, GARAGE, GARDEN, BALCONY]
+        floor:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+          
+    createLocationRoom:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        room_type:
+          type: string
+          enum: [LIVING_ROOM, BEDROOM, KITCHEN, BATHROOM, HALLWAY, OFFICE, GARAGE, GARDEN, BALCONY]
+        floor:
+          type: integer
+    
+    updateLocationRoom:
+      type: object
+      properties:
+        title:
+          type: string
+        room_type:
+          type: string
+          enum: [LIVING_ROOM, BEDROOM, KITCHEN, BATHROOM, HALLWAY, OFFICE, GARAGE, GARDEN, BALCONY]
+        floor:
+          type: integer
+      
+    heatingDevices:
+      type: object
+      required:
+        - id
+        - title
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        energy:
+          type: integer
+          minimum: 0
+          maximum: 100
+        temperature:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+    
+    createHeatingDevice:
+      type: object
+      required:
+        - qr_data
+        - title
+      properties:
+        qr_data:
+          type: string
+        title:
+          type: string
+    
+    
+    heatingDevice:
+      type: object
+      required:
+        - id
+        - title
+        - manufacture
+        - model
+        - is_active
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        manufacturer:
+          type: string
+        model:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        default_temperature:
+          type: integer
+        min_temperature:
+          type: integer
+        max_temperature:
+          type: integer
+    
+    
+    updateHeatingDevice:
+      type: object
+      properties:
+        title:
+          type: string
+        default_temperature:
+          type: integer
+        min_temperature:
+          type: integer
+        max_temperature:
+          type: integer
+        
+          
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  
+security:
+  - bearerAuth: []

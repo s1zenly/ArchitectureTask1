@@ -142,6 +142,13 @@ func (h *SensorHandler) CreateSensor(c *gin.Context) {
 		return
 	}
 
+	tempData, err := h.TemperatureService.GetTemperature(sensor.Location)
+	if err == nil {
+		sensor.Value = tempData.Value
+	} else {
+		log.Printf("Failed to fetch temperature data for sensor %s: %v", sensor.Location, err)
+	}
+
 	c.JSON(http.StatusCreated, sensor)
 }
 
